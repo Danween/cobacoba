@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Get Location</title>
+    <style>
+      /* Gaya untuk layout */
+      body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 0;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        background-color: #f4f4f4;
+      }
+
+      #plokasi {
+        background-color: #ffffff;
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        text-align: center;
+        width: 300px;
+      }
+
+      h1 {
+        margin: 0 0 20px;
+        font-size: 18px;
+        color: #333;
+      }
+
+      button {
+        background-color: #007bff;
+        color: #fff;
+        border: none;
+        padding: 10px 20px;
+        font-size: 14px;
+        border-radius: 5px;
+        cursor: pointer;
+        transition: background-color 0.3s;
+      }
+
+      button:hover {
+        background-color: #0056b3;
+      }
+
+      .location-info {
+        margin-top: 20px;
+      }
+
+      .coordinate {
+        font-size: 14px;
+        margin: 5px 0;
+        color: #555;
+      }
+
+      #status {
+        font-size: 14px;
+        margin: 10px 0;
+        color: #666;
+      }
+
+      #status.success {
+        color: green;
+      }
+
+      #status.error {
+        color: red;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="plokasi">
+      <h1>Dapatkan Lokasi Anda</h1>
+      <button id="get-location-btn">Dapatkan Lokasi</button>
+      <div class="location-info">
+        <p id="status">Klik tombol untuk melacak lokasi Anda</p>
+        <p class="coordinate">Latitude: <span id="latitude">-</span></p>
+        <p class="coordinate">Longitude: <span id="longitude">-</span></p>
+      </div>
+    </div>
+
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        const status = document.getElementById("status");
+        const latitudeSpan = document.getElementById("latitude");
+        const longitudeSpan = document.getElementById("longitude");
+        const getLocationBtn = document.getElementById("get-location-btn");
+
+        // Fungsi untuk mendapatkan lokasi sekali
+        function getLocationOnce() {
+          if (navigator.geolocation) {
+            status.textContent = "Melacak lokasi...";
+            status.classList.remove("success", "error");
+            status.style.color = "#666"; // Warna default
+
+            navigator.geolocation.getCurrentPosition(
+              (position) => {
+                const latitude = position.coords.latitude;
+                const longitude = position.coords.longitude;
+
+                latitudeSpan.textContent = latitude.toFixed(6);
+                longitudeSpan.textContent = longitude.toFixed(6);
+
+                status.textContent = "Lokasi berhasil diperoleh!";
+                status.classList.add("success");
+              },
+              (error) => {
+                let errorMessage;
+                switch (error.code) {
+                  case error.PERMISSION_DENIED:
+                    errorMessage = "Izin lokasi ditolak oleh pengguna.";
+                    break;
+                  case error.POSITION_UNAVAILABLE:
+                    errorMessage = "Informasi lokasi tidak tersedia.";
+                    break;
+                  case error.TIMEOUT:
+                    errorMessage = "Waktu permintaan lokasi habis.";
+                    break;
+                  default:
+                    errorMessage = "Terjadi kesalahan yang tidak diketahui.";
+                }
+                status.textContent = errorMessage;
+                status.classList.add("error");
+              },
+              {
+                enableHighAccuracy: true,
+                timeout: 5000,
+                maximumAge: 0,
+              }
+            );
+          } else {
+            status.textContent = "Browser tidak mendukung geolokasi.";
+            status.classList.add("error");
+          }
+        }
+
+        // Tambahkan event listener untuk tombol
+        getLocationBtn.addEventListener("click", getLocationOnce);
+      });
+    </script>
+  </body>
+</html>
